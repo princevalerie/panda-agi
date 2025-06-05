@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    image: ghcr.io/sinaptik-ai/panda-agi/panda-agi-ui:main-backend
+    container_name: panda-agi-backend
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8080:8080"
+      - "2664:2664"
+    environment:
+      - PYTHONPATH=/app
+      - WORKSPACE_PATH=./workspace
+      - FASTAPI_RELOAD=false
+    volumes:
+      - ./workspace:/app/workspace
+    networks:
+      - panda-agi-network
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  frontend:
+    image: ghcr.io/sinaptik-ai/panda-agi/panda-agi-ui:main-frontend
+    container_name: panda-agi-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - panda-agi-network
+    restart: unless-stopped
+    env_file:
+      - .env
+
+networks:
+  panda-agi-network:
+    driver: bridge
+
+volumes:
+  workspace:
